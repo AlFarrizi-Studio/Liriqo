@@ -1,5 +1,6 @@
-// Liriqo Lyrics API — Frontend
-const API = "https://hitpmqtnvaugyksgubnj.supabase.co/functions/v1/lyrics";
+// Liriqo Lyrics API — Frontend (Live data from Supabase)
+const LYRICS_API = "https://hitpmqtnvaugyksgubnj.supabase.co/functions/v1/lyrics";
+const STATS_API  = "https://hitpmqtnvaugyksgubnj.supabase.co/functions/v1/stats";
 
 const ENDPOINTS = [
   { provider: "LyricFind/Musixmatch", method: "GET", path: "/lyrics?videoId=XXX" },
@@ -7,27 +8,6 @@ const ENDPOINTS = [
   { provider: "Plain text only", method: "GET", path: "/lyrics/plain?videoId=XXX" },
   { provider: "LRC synced", method: "GET", path: "/lyrics/lrc?videoId=XXX" },
   { provider: "Search + top 5", method: "GET", path: "/lyrics/search?q=XXX" },
-];
-
-const LYRIC_PROVIDERS = [
-  {
-    name: "LyricFind",
-    key: "lyricfind",
-    desc: "Official lyrics from musicians, music labels, and publishers. Accurate and fully licensed for the commercial market.",
-    sample: "Bohemian Rhapsody, As It Was, Tum Hi Ho, Kangen",
-    hits: 28,
-    success: "100%",
-    avgTime: "1.1s",
-  },
-  {
-    name: "Musixmatch",
-    key: "musixmatch",
-    desc: "Synced lyrics from the Musixmatch community. Extensive coverage for Western and K-Pop tracks. Accurate LRC format.",
-    sample: "Dynamite, Blinding Lights, Bad Guy, STAY",
-    hits: 24,
-    success: "100%",
-    avgTime: "1.3s",
-  },
 ];
 
 // ===== Render Endpoints =====
@@ -49,38 +29,67 @@ function renderEndpoints() {
   });
 }
 
-// ===== Render Lyric Providers =====
+// ===== Render Lyric Providers (static info card, stats pulled live) =====
+const LYRIC_PROVIDER_INFO = {
+  LyricFind: {
+    key: "lyricfind",
+    name: "LyricFind",
+    desc: "Official lyrics from musicians, music labels, and publishers. Accurate and fully licensed for the commercial market.",
+    sample: "Bohemian Rhapsody, As It Was, Tum Hi Ho, Kangen",
+    badge: "GREEN",
+  },
+  Musixmatch: {
+    key: "musixmatch",
+    name: "Musixmatch",
+    desc: "Synced lyrics from the Musixmatch community. Extensive coverage for Western and K-Pop tracks. Accurate LRC format.",
+    sample: "Dynamite, Blinding Lights, Bad Guy, STAY",
+    badge: "YELLOW",
+  },
+};
+
 function renderLyricProviders() {
   const grid = document.getElementById("lyric-provider-grid");
   grid.innerHTML = "";
-  LYRIC_PROVIDERS.forEach((p) => {
+  Object.values(LYRIC_PROVIDER_INFO).forEach((p) => {
     const card = document.createElement("div");
     card.className = "lyric-provider-card " + p.key;
     card.innerHTML = `
       <div class="lyric-provider-header">
         <div class="lyric-provider-name">${p.name}</div>
-        <span class="lyric-provider-badge">${p.key === "lyricfind" ? "GREEN" : "YELLOW"}</span>
+        <span class="lyric-provider-badge">${p.badge}</span>
       </div>
       <div class="lyric-provider-desc">${p.desc}</div>
       <div style="font-size:0.7rem; color:var(--text-dim); font-family:'JetBrains Mono', monospace;">
         <strong style="color:var(--text-muted);">sample:</strong> ${p.sample}
       </div>
-      <div class="lyric-provider-stats">
+      <div class="lyric-provider-stats" data-provider="${p.name}">
         <div class="lyric-stat">
-          <div class="lyric-stat-value">${p.hits}</div>
+          <div class="lyric-stat-value" data-hits>0</div>
           <div class="lyric-stat-label">total hits</div>
         </div>
         <div class="lyric-stat">
-          <div class="lyric-stat-value">${p.success}</div>
+          <div class="lyric-stat-value" data-success>—</div>
           <div class="lyric-stat-label">success rate</div>
         </div>
         <div class="lyric-stat">
-          <div class="lyric-stat-value">${p.avgTime}</div>
+          <div class="lyric-stat-value" data-avg>—</div>
           <div class="lyric-stat-label">avg response</div>
         </div>
       </div>
     `;
     grid.appendChild(card);
+  });
+}
+
+function updateLyricProviderStats(providers) {
+  if (!providers) return;
+  Object.entries(providers).forEach(([name, info]) => {
+    const card = document.querySelector(`.lyric-provider-stats[data-provider="${name}"]`);
+    if (!card) return;
+    card.querySelector("[data-hits]").textContent = info.hits ?? 0;
+    card.querySelector("[data-success]").textContent = info.success_rate ?? "100%";
+    const avgMs = Math.round(info.avg_ms ?? 0);
+    card.querySelector("[data-avg]").textContent = avgMs ? (avgMs / 1000).toFixed(1) + "s" : "—";
   });
 }
 
@@ -112,54 +121,16 @@ function animateValue(el, to, duration = 600) {
   requestAnimationFrame(step);
 }
 
-// ===== Request Log =====
+// ===== Request Log (live from Supabase) =====
 const LOG_PAGE = 10;
 let _log = [];
 let _lastLogTimestamp = null;
 let _logExpanded = false;
 let _collapsedHeight = null;
 
-function pushLog(entry) {
-  _log.unshift(entry);
-  if (_log.length > 100) _log.pop();
+function setLog(entries) {
+  _log = entries || [];
   renderLog();
-}
-
-async function probeEndpoint(url, track, artist, provider) {
-  const t0 = performance.now();
-  try {
-    const r = await fetch(url);
-    const ms = Math.round(performance.now() - t0);
-    const ok = r.ok;
-    let actualProvider = provider;
-    if (ok) {
-      try {
-        const data = await r.json();
-        actualProvider = data.provider || provider;
-      } catch {}
-    }
-    pushLog({
-      status: ok ? "ok" : "err",
-      track: track,
-      artist: artist,
-      provider: actualProvider,
-      endpoint: new URL(url).pathname + (new URL(url).search || ""),
-      ip: "127.0.0.1",
-      ms: ms,
-      timestamp: new Date().toISOString(),
-    });
-  } catch (e) {
-    pushLog({
-      status: "err",
-      track: track,
-      artist: artist,
-      provider: provider,
-      endpoint: new URL(url).pathname,
-      ip: "127.0.0.1",
-      ms: Math.round(performance.now() - t0),
-      timestamp: new Date().toISOString(),
-    });
-  }
 }
 
 function buildLogRow(entry, isNew) {
@@ -171,9 +142,9 @@ function buildLogRow(entry, isNew) {
     ? `<span class="log-status ok">200 OK</span>`
     : `<span class="log-status err">ERR</span>`;
 
-  const providerClass = (entry.provider || "none").toLowerCase();
+  const providerKey = (entry.provider || "none").toLowerCase();
   const providerHtml = entry.provider
-    ? `<span class="log-provider-tag ${providerClass}">${entry.provider}</span>`
+    ? `<span class="log-provider-tag ${providerKey}">${entry.provider}</span>`
     : `<span class="log-provider-tag none">none</span>`;
 
   const time = new Date(entry.timestamp);
@@ -181,14 +152,12 @@ function buildLogRow(entry, isNew) {
 
   tr.innerHTML = `
     <td>${statusHtml}</td>
-    <td>
-      <div class="log-track">${entry.track || "—"}</div>
-      <div class="log-track-artist">${entry.artist || ""}</div>
-    </td>
+    <td><div class="log-track">${entry.title || entry.track || "—"}</div></td>
+    <td><div class="log-track-artist">${entry.artist || ""}</div></td>
     <td>${providerHtml}</td>
-    <td class="log-endpoint" title="${entry.endpoint}">${entry.endpoint}</td>
-    <td class="log-ip col-ip" title="${entry.ip}">${entry.ip}</td>
-    <td class="log-ms">${entry.ms}</td>
+    <td class="log-endpoint" title="${entry.endpoint || ""}">${entry.endpoint || ""}</td>
+    <td class="log-ip col-ip" title="${entry.ip || ""}">${entry.ip || ""}</td>
+    <td class="log-ms">${entry.ms ?? 0}</td>
     <td title="${entry.timestamp}">${timeStr}</td>
   `;
   return tr;
@@ -201,16 +170,17 @@ function renderLog() {
   const toggleBtn = document.getElementById("log-toggle");
   const wrapEl = document.getElementById("log-table-wrap");
 
-  countEl.textContent = `${_log.length} entr${_log.length === 1 ? "y" : "ies"}`;
+  countEl.textContent = `${_log.length} entr${_log.length === 1 ? "y" : "ies"} · live · max 100`;
   emptyEl.style.display = _log.length ? "none" : "block";
 
   tbody.innerHTML = "";
+  const newest = _log[0]?.timestamp;
   _log.forEach((entry) => {
     const isNew = _lastLogTimestamp && entry.timestamp > _lastLogTimestamp;
     const tr = buildLogRow(entry, isNew);
     tbody.appendChild(tr);
   });
-  if (_log.length) _lastLogTimestamp = _log[0].timestamp;
+  if (newest) _lastLogTimestamp = newest;
 
   if (_log.length > LOG_PAGE) {
     toggleBtn.style.display = "flex";
@@ -254,52 +224,15 @@ function initLogToggle() {
   });
 }
 
-// ===== Periodic Stats Update =====
-let totalReq = 0;
-let failedReq = 0;
-
-function updateStats() {
-  animateValue(document.getElementById("stat-total"), totalReq, 500);
-  const successRate = totalReq > 0 ? Math.round(((totalReq - failedReq) / totalReq) * 100) : 100;
-  document.getElementById("stat-success").textContent = successRate + "%";
-  document.getElementById("stat-success-sub").textContent = successRate === 100 ? "all requests passed" : "last 24h";
-  animateValue(document.getElementById("stat-failed"), failedReq, 500);
-  animateValue(document.getElementById("stat-uptime"), 1200, 500);
-}
-
-// ===== Auto-probe endpoints for demo =====
-async function autoProbe() {
-  const samples = [
-    { videoId: "HaEYUJ2aRHs", track: "Dynamite", artist: "BTS", expected: "Musixmatch" },
-    { videoId: "JMAJS_s99Ho", track: "きゅうくらりん", artist: "Iyowa", expected: "LyricFind" },
-    { videoId: "kM0Fpbz0W8U", track: "Bohemian Rhapsody", artist: "Queen", expected: "LyricFind" },
-  ];
-  for (const s of samples) {
-    const url = `${API}?videoId=${s.videoId}`;
-    totalReq++;
-    await probeEndpoint(url, s.track, s.artist, s.expected);
-    await new Promise((r) => setTimeout(r, 500));
-  }
-  updateStats();
-}
-
-// ===== Performance Charts =====
+// ===== Performance Charts (live data) =====
 const PERF_WINDOW = 30;
 const perfData = {
   lyricfind: [],
   musixmatch: [],
 };
 
-function recordPerf(provider, ms) {
-  const key = (provider || "").toLowerCase();
-  if (!perfData[key]) return;
-  perfData[key].push(ms);
-  if (perfData[key].length > PERF_WINDOW) perfData[key].shift();
-  renderChart(key);
-}
-
 function calcStats(arr) {
-  if (!arr.length) return { current: 0, avg: 0, trend: 0, change: 0 };
+  if (!arr.length) return { current: 0, avg: 0, trend: 0 };
   const half = Math.floor(arr.length / 2);
   const recent = arr.slice(half);
   const older = arr.slice(0, half);
@@ -307,7 +240,7 @@ function calcStats(arr) {
   const recentAvg = recent.length ? recent.reduce((a, b) => a + b, 0) / recent.length : avg;
   const olderAvg = older.length ? older.reduce((a, b) => a + b, 0) / older.length : avg;
   const change = olderAvg ? ((recentAvg - olderAvg) / olderAvg) * 100 : 0;
-  return { current: arr.length, avg: Math.round(avg), trend: change, last: arr[arr.length - 1] };
+  return { current: arr.length, avg: Math.round(avg), trend: change };
 }
 
 function buildPath(points, w, h) {
@@ -340,7 +273,6 @@ function renderChart(provider) {
   const w = 600;
   const h = 120;
 
-  // Grid lines
   const grid = svg.querySelector(".perf-grid");
   grid.innerHTML = "";
   for (let i = 0; i < 4; i++) {
@@ -353,32 +285,31 @@ function renderChart(provider) {
     grid.appendChild(line);
   }
 
-  // Path
   const linePath = svg.querySelector(".perf-line");
   const areaPath = svg.querySelector(".perf-area");
   linePath.setAttribute("d", buildPath(data, w, h));
   areaPath.setAttribute("d", buildAreaPath(data, w, h));
 
-  // Points
   const pointsG = svg.querySelector(".perf-points");
   pointsG.innerHTML = "";
-  const max = Math.max(...data, 100);
-  const min = Math.min(...data, 0);
-  const range = max - min || 1;
-  const stepX = w / Math.max(data.length - 1, 1);
-  data.forEach((v, i) => {
-    const x = i * stepX;
-    const y = h - ((v - min) / range) * h;
-    const c = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-    c.setAttribute("cx", x);
-    c.setAttribute("cy", y);
-    c.setAttribute("r", 2);
-    c.setAttribute("fill", provider === "lyricfind" ? "#22c55e" : "#eab308");
-    c.setAttribute("opacity", 0.6);
-    pointsG.appendChild(c);
-  });
+  if (data.length) {
+    const max = Math.max(...data, 100);
+    const min = Math.min(...data, 0);
+    const range = max - min || 1;
+    const stepX = w / Math.max(data.length - 1, 1);
+    data.forEach((v, i) => {
+      const x = i * stepX;
+      const y = h - ((v - min) / range) * h;
+      const c = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+      c.setAttribute("cx", x);
+      c.setAttribute("cy", y);
+      c.setAttribute("r", 2);
+      c.setAttribute("fill", provider === "lyricfind" ? "#22c55e" : "#eab308");
+      c.setAttribute("opacity", 0.6);
+      pointsG.appendChild(c);
+    });
+  }
 
-  // Update stats
   const stats = calcStats(data);
   const prefix = provider === "lyricfind" ? "lf" : "mxm";
   document.getElementById(prefix + "-current").textContent = stats.current;
@@ -401,10 +332,85 @@ function renderAllCharts() {
   renderChart("musixmatch");
 }
 
+function applyPerformance(perf) {
+  if (!perf) return;
+  perfData.lyricfind = (perf.LyricFind || []).slice(-PERF_WINDOW);
+  perfData.musixmatch = (perf.Musixmatch || []).slice(-PERF_WINDOW);
+  renderAllCharts();
+}
+
+// ===== Top stats bar =====
+function applyTopStats(s) {
+  const total = s.total_requests ?? 0;
+  const failed = s.failed_requests ?? 0;
+  const success = s.successful_requests ?? (total - failed);
+  const avg = s.avg_ms ?? 0;
+
+  animateValue(document.getElementById("stat-total"), total, 500);
+
+  const successRate = total > 0 ? ((success / total) * 100).toFixed(1) : "100.0";
+  document.getElementById("stat-success").textContent = successRate + "%";
+  document.getElementById("stat-success-sub").textContent =
+    successRate === "100.0" ? "all requests passed" : "since deploy";
+
+  animateValue(document.getElementById("stat-failed"), failed, 500);
+  animateValue(document.getElementById("stat-uptime"), avg, 500);
+}
+
+// ===== Live polling from Supabase =====
+async function fetchStats() {
+  try {
+    const r = await fetch(`${STATS_API}?limit=100&t=${Date.now()}`);
+    if (!r.ok) return null;
+    return await r.json();
+  } catch {
+    return null;
+  }
+}
+
+let _polling = false;
+
+async function pollStats() {
+  if (_polling) return;
+  _polling = true;
+  try {
+    const data = await fetchStats();
+    if (!data) return;
+
+    applyTopStats(data);
+
+    const providers = {
+      LyricFind: {
+        hits: data.providers?.LyricFind?.hits ?? 0,
+        success_rate: data.providers?.LyricFind?.success_rate ?? "100%",
+        avg_ms: data.performance?.LyricFind?.length
+          ? data.performance.LyricFind.reduce((a, b) => a + b, 0) / data.performance.LyricFind.length
+          : 0,
+      },
+      Musixmatch: {
+        hits: data.providers?.Musixmatch?.hits ?? 0,
+        success_rate: data.providers?.Musixmatch?.success_rate ?? "100%",
+        avg_ms: data.performance?.Musixmatch?.length
+          ? data.performance.Musixmatch.reduce((a, b) => a + b, 0) / data.performance.Musixmatch.length
+          : 0,
+      },
+    };
+    updateLyricProviderStats(providers);
+    applyPerformance(data.performance);
+    setLog(data.logs || []);
+  } finally {
+    _polling = false;
+  }
+}
+
+function startLivePolling() {
+  pollStats();
+  setInterval(pollStats, 3000);
+}
+
 // ===== Init =====
 renderEndpoints();
 renderLyricProviders();
 initLogToggle();
 renderAllCharts();
-updateStats();
-autoProbe();
+startLivePolling();
