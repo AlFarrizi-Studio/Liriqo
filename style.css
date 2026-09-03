@@ -295,11 +295,39 @@ nav {
   align-items: center;
   gap: 14px;
   transition: all 0.18s ease;
+  position: relative;
 }
 .endpoint-card:hover {
   border-color: var(--border-hover);
   background: var(--bg-card-hover);
   transform: translateY(-2px);
+}
+
+.btn-copy {
+  background: transparent;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 6px 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.7rem;
+  font-family: inherit;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+.btn-copy:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-dim);
+}
+.btn-copy.copied {
+  background: var(--green-dim);
+  border-color: var(--green);
+  color: var(--green);
 }
 
 .method-badge {
@@ -411,7 +439,19 @@ nav {
 .lyric-provider-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 12px;
+}
+
+.lyric-provider-logo {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+}
+
+.provider-logo-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
 }
 
 .lyric-provider-name {
@@ -421,25 +461,6 @@ nav {
 }
 .lyric-provider-card.lyricfind .lyric-provider-name { color: var(--green); }
 .lyric-provider-card.musixmatch .lyric-provider-name { color: var(--yellow); }
-
-.lyric-provider-badge {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.7rem;
-  padding: 3px 8px;
-  border-radius: 20px;
-  font-weight: 500;
-  border: 1px solid;
-}
-.lyric-provider-card.lyricfind .lyric-provider-badge {
-  background: var(--green-dim);
-  color: var(--green);
-  border-color: rgba(34, 197, 94, 0.2);
-}
-.lyric-provider-card.musixmatch .lyric-provider-badge {
-  background: var(--yellow-dim);
-  color: var(--yellow);
-  border-color: rgba(234, 179, 8, 0.2);
-}
 
 .lyric-provider-desc {
   font-size: 0.78rem;
@@ -497,6 +518,7 @@ nav {
 .perf-chart-card:hover { border-color: var(--border-hover); }
 .perf-chart-card.lyricfind { border-left: 3px solid var(--green); }
 .perf-chart-card.musixmatch { border-left: 3px solid var(--yellow); }
+.perf-chart-card.combined { border-left: 3px solid transparent; margin-bottom: 30px; }
 
 .perf-chart-header {
   display: flex;
@@ -504,6 +526,42 @@ nav {
   align-items: flex-start;
   margin-bottom: 14px;
 }
+
+.perf-chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  width: 100%;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.lyricfind-dot { background: var(--green); }
+.musixmatch-dot { background: var(--yellow); }
+
+.legend-label {
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.legend-meta {
+  color: var(--text-muted);
+}
+
+.legend-meta span { color: var(--text-main); font-weight: 500; }
 
 .perf-chart-name {
   font-size: 1rem;
@@ -550,7 +608,7 @@ nav {
 
 .perf-svg {
   width: 100%;
-  height: 120px;
+  height: 160px;
   display: block;
 }
 
