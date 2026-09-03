@@ -3,11 +3,11 @@ const LYRICS_API = "https://kkwehlfmisoenatxpank.supabase.co/functions/v1/lyrics
 const STATS_API  = "https://kkwehlfmisoenatxpank.supabase.co/functions/v1/stats";
 
 const ENDPOINTS = [
-  { provider: "LyricFind/Musixmatch", method: "GET", path: "/lyrics?videoId=XXX" },
-  { provider: "Multi-provider", method: "GET", path: "/lyrics?title=X&artist=Y&source=..." },
-  { provider: "Plain text only", method: "GET", path: "/lyrics/plain?videoId=XXX" },
-  { provider: "LRC synced", method: "GET", path: "/lyrics/lrc?videoId=XXX" },
-  { provider: "Search + top 5", method: "GET", path: "/lyrics/search?q=XXX" },
+  { provider: "LyricFind/Musixmatch", method: "GET", path: "/lyrics?videoId=XXX", full: "https://kkwehlfmisoenatxpank.supabase.co/functions/v1/lyrics" },
+  { provider: "Multi-provider", method: "GET", path: "/lyrics?title=X&artist=Y&source=...", full: "https://kkwehlfmisoenatxpank.supabase.co/functions/v1/lyrics" },
+  { provider: "Plain text only", method: "GET", path: "/lyrics/plain?videoId=XXX", full: "https://kkwehlfmisoenatxpank.supabase.co/functions/v1/lyrics" },
+  { provider: "LRC synced", method: "GET", path: "/lyrics/lrc?videoId=XXX", full: "https://kkwehlfmisoenatxpank.supabase.co/functions/v1/lyrics" },
+  { provider: "Search + top 5", method: "GET", path: "/lyrics/search?q=XXX", full: "https://kkwehlfmisoenatxpank.supabase.co/functions/v1/lyrics" },
 ];
 
 // ===== Render Endpoints =====
@@ -24,8 +24,29 @@ function renderEndpoints() {
         <div class="endpoint-path">${ep.path}</div>
         <div class="endpoint-provider">${ep.provider}</div>
       </div>
+      <button class="btn-copy" data-url="${ep.full}" title="Copy base URL">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+        </svg>
+      </button>
     `;
     grid.appendChild(card);
+  });
+  grid.querySelectorAll(".btn-copy").forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const url = btn.getAttribute("data-url");
+      navigator.clipboard.writeText(url).then(() => {
+        btn.classList.add("copied");
+        const original = btn.innerHTML;
+        btn.innerHTML = "✓";
+        setTimeout(() => {
+          btn.classList.remove("copied");
+          btn.innerHTML = original;
+        }, 1200);
+      });
+    });
   });
 }
 
@@ -35,33 +56,36 @@ const LYRIC_PROVIDER_INFO = {
     key: "lyricfind",
     name: "LyricFind",
     desc: "Official lyrics from musicians, music labels, and publishers. Accurate and fully licensed for the commercial market.",
-    sample: "Bohemian Rhapsody, As It Was, Tum Hi Ho, Kangen",
-    badge: "GREEN",
   },
   Musixmatch: {
     key: "musixmatch",
     name: "Musixmatch",
     desc: "Synced lyrics from the Musixmatch community. Extensive coverage for Western and K-Pop tracks. Accurate LRC format.",
-    sample: "Dynamite, Blinding Lights, Bad Guy, STAY",
-    badge: "YELLOW",
   },
 };
 
 function renderLyricProviders() {
   const grid = document.getElementById("lyric-provider-grid");
   grid.innerHTML = "";
+  const logos = {
+    lyricfind: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" class="provider-logo-svg">
+      <circle cx="50" cy="50" r="45" fill="#22c55e"/>
+      <text x="50" y="62" font-size="32" font-weight="700" text-anchor="middle" fill="white" font-family="Inter, sans-serif">LF</text>
+    </svg>`,
+    musixmatch: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" class="provider-logo-svg">
+      <circle cx="50" cy="50" r="45" fill="#eab308"/>
+      <text x="50" y="62" font-size="32" font-weight="700" text-anchor="middle" fill="white" font-family="Inter, sans-serif">MM</text>
+    </svg>`,
+  };
   Object.values(LYRIC_PROVIDER_INFO).forEach((p) => {
     const card = document.createElement("div");
     card.className = "lyric-provider-card " + p.key;
     card.innerHTML = `
       <div class="lyric-provider-header">
+        <div class="lyric-provider-logo">${logos[p.key] || ""}</div>
         <div class="lyric-provider-name">${p.name}</div>
-        <span class="lyric-provider-badge">${p.badge}</span>
       </div>
       <div class="lyric-provider-desc">${p.desc}</div>
-      <div style="font-size:0.7rem; color:var(--text-dim); font-family:'JetBrains Mono', monospace;">
-        <strong style="color:var(--text-muted);">sample:</strong> ${p.sample}
-      </div>
       <div class="lyric-provider-stats" data-provider="${p.name}">
         <div class="lyric-stat">
           <div class="lyric-stat-value" data-hits>0</div>
@@ -265,32 +289,34 @@ function buildAreaPath(points, w, h) {
 }
 
 function renderChart(provider) {
-  const svgId = provider === "lyricfind" ? "lf-svg" : "mxm-svg";
-  const svg = document.getElementById(svgId);
+  const svg = document.getElementById("perf-svg");
   if (!svg) return;
 
-  const data = perfData[provider];
   const w = 600;
-  const h = 120;
+  const h = 160;
+  const data = perfData[provider];
+  const color = provider === "lyricfind" ? "#22c55e" : "#eab308";
 
-  const grid = svg.querySelector(".perf-grid");
-  grid.innerHTML = "";
-  for (let i = 0; i < 4; i++) {
-    const y = (h / 4) * i;
-    const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
-    line.setAttribute("x1", 0);
-    line.setAttribute("y1", y);
-    line.setAttribute("x2", w);
-    line.setAttribute("y2", y);
-    grid.appendChild(line);
+  if (provider === "lyricfind") {
+    const grid = svg.querySelector(".perf-grid");
+    grid.innerHTML = "";
+    for (let i = 0; i < 4; i++) {
+      const y = (h / 4) * i;
+      const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+      line.setAttribute("x1", 0);
+      line.setAttribute("y1", y);
+      line.setAttribute("x2", w);
+      line.setAttribute("y2", y);
+      grid.appendChild(line);
+    }
   }
 
-  const linePath = svg.querySelector(".perf-line");
-  const areaPath = svg.querySelector(".perf-area");
+  const linePath = svg.querySelector(`.${provider === "lyricfind" ? "lyricfind" : "musixmatch"}-line`);
+  const areaPath = svg.querySelector(`.${provider === "lyricfind" ? "lf" : "mxm"}-area`);
   linePath.setAttribute("d", buildPath(data, w, h));
   areaPath.setAttribute("d", buildAreaPath(data, w, h));
 
-  const pointsG = svg.querySelector(".perf-points");
+  const pointsG = svg.querySelector(`.${provider === "lyricfind" ? "lf" : "mxm"}-points`);
   pointsG.innerHTML = "";
   if (data.length) {
     const max = Math.max(...data, 100);
@@ -304,7 +330,7 @@ function renderChart(provider) {
       c.setAttribute("cx", x);
       c.setAttribute("cy", y);
       c.setAttribute("r", 2);
-      c.setAttribute("fill", provider === "lyricfind" ? "#22c55e" : "#eab308");
+      c.setAttribute("fill", color);
       c.setAttribute("opacity", 0.6);
       pointsG.appendChild(c);
     });
