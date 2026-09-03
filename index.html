@@ -3,64 +3,100 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Liriqo Lyrics API — Free LyricFind & Musixmatch Resolver</title>
-  <meta name="description" content="Free forever lyrics API. Resolve tracks from 12+ music providers (Spotify, Apple Music, Tidal, JioSaavn) to LyricFind & Musixmatch synced lyrics." />
+  <title>Liriqo Lyrics API</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+
+<div class="bg-grid"></div>
+
+<div class="container fade-in">
+
+  <nav>
+    <div class="brand">
+      Liriqo Lyrics API
+      <span class="pill pill-version">v1.0.0</span>
+      <span class="pill pill-live">Live</span>
+    </div>
+    <div class="nav-actions">
+      <a href="#endpoints" class="btn btn-primary">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+        Docs
+      </a>
+      <a href="https://github.com/liriqo/lyrics-api" target="_blank" class="btn btn-ghost">GitHub</a>
+    </div>
+  </nav>
+
   <header class="hero">
-    <div class="container">
-      <div class="badge">🎵 Powered by YouTube Music InnerTube</div>
-      <h1>Liriqo Lyrics API</h1>
-      <p class="tagline">Free forever <strong>LyricFind</strong> &amp; <strong>Musixmatch</strong> lyrics resolver. Resolve tracks from 12+ music providers.</p>
-      <div class="cta">
-        <a href="#demo" class="btn btn-primary">Try Live Demo</a>
-        <a href="#endpoints" class="btn btn-ghost">View API Docs</a>
-        <a href="https://github.com/liriqo/lyrics-api" target="_blank" rel="noopener" class="btn btn-ghost">⭐ GitHub</a>
-      </div>
-      <div class="stats">
-        <div class="stat"><span class="num">500K</span><span class="label">invocations / month</span></div>
-        <div class="stat"><span class="num">12+</span><span class="label">music providers</span></div>
-        <div class="stat"><span class="num">100%</span><span class="label">tested success</span></div>
-        <div class="stat"><span class="num">~1.2s</span><span class="label">avg response</span></div>
-      </div>
+    <p class="hero-eyebrow">Free Forever · 500K invocations/month · Multi-provider</p>
+    <h1>Lyrics API</h1>
+    <p>Fetch synced and plain lyrics from <strong>LyricFind</strong> &amp; <strong>Musixmatch</strong> via YouTube Music InnerTube. Resolve tracks from 12+ music providers.</p>
+    <div class="hero-actions">
+      <a href="#endpoints" class="btn btn-primary">Read Documentation</a>
+      <a href="#demo" class="btn btn-ghost">Try Live Demo</a>
     </div>
   </header>
 
-  <section class="demo" id="demo">
-    <div class="container">
-      <h2>🔍 Live Demo</h2>
-      <p class="section-desc">Pilih mode pencarian dan lihat hasilnya secara real-time.</p>
+  <section class="stats-bar" id="stats-bar">
+    <div class="stat-card blue">
+      <span class="stat-label">Total Requests</span>
+      <span class="stat-value" id="stat-total">—</span>
+      <span class="stat-sub">since deploy</span>
+    </div>
+    <div class="stat-card green">
+      <span class="stat-label">Success Rate</span>
+      <span class="stat-value" id="stat-success">—</span>
+      <span class="stat-sub" id="stat-success-sub">last 24h</span>
+    </div>
+    <div class="stat-card red">
+      <span class="stat-label">Failed Requests</span>
+      <span class="stat-value" id="stat-failed">—</span>
+      <span class="stat-sub">errors encountered</span>
+    </div>
+    <div class="stat-card purple">
+      <span class="stat-label">Avg Response</span>
+      <span class="stat-value" id="stat-uptime">—</span>
+      <span class="stat-sub" id="stat-uptime-sub">milliseconds</span>
+    </div>
+  </section>
 
-      <div class="tabs">
-        <button class="tab active" data-tab="meta">By Track Metadata</button>
-        <button class="tab" data-tab="videoId">By YT Music videoId</button>
-        <button class="tab" data-tab="search">Search YT Music</button>
+  <main>
+    <div class="section-header">
+      <span class="section-title">API Endpoints</span>
+      <span class="section-count" id="endpoint-count">5 routes</span>
+    </div>
+    <div class="endpoint-grid" id="endpoint-grid"></div>
+
+    <div class="section-header">
+      <span class="section-title">Provider Usage</span>
+      <span class="section-count">12 supported</span>
+    </div>
+    <div class="provider-grid" id="provider-grid"></div>
+
+    <div class="section-header">
+      <span class="section-title">Live Demo</span>
+      <span class="section-count">interactive</span>
+    </div>
+    <div class="demo-section" id="demo">
+      <div class="demo-tabs">
+        <button class="demo-tab active" data-tab="meta">By Track Metadata</button>
+        <button class="demo-tab" data-tab="videoId">By videoId</button>
+        <button class="demo-tab" data-tab="search">Search</button>
       </div>
 
-      <div class="tab-content active" id="tab-meta">
-        <form id="form-meta" class="form">
-          <div class="row">
-            <label>
-              <span>Title *</span>
-              <input name="title" required placeholder="Blinding Lights" value="Blinding Lights" />
-            </label>
-            <label>
-              <span>Artist</span>
-              <input name="artist" placeholder="The Weeknd" value="The Weeknd" />
-            </label>
+      <div class="demo-content active" id="demo-meta">
+        <form id="form-meta" class="demo-form">
+          <div class="demo-row">
+            <label><span>Title</span><input name="title" required value="Blinding Lights" placeholder="Blinding Lights" /></label>
+            <label><span>Artist</span><input name="artist" value="The Weeknd" placeholder="The Weeknd" /></label>
           </div>
-          <div class="row">
-            <label>
-              <span>Album</span>
-              <input name="album" placeholder="After Hours" value="After Hours" />
-            </label>
-            <label>
-              <span>Duration (sec)</span>
-              <input name="duration" type="number" placeholder="200" value="200" />
-            </label>
-            <label>
-              <span>Source</span>
+          <div class="demo-row">
+            <label><span>Album</span><input name="album" value="After Hours" placeholder="After Hours" /></label>
+            <label><span>Duration</span><input name="duration" type="number" value="200" placeholder="200" /></label>
+            <label><span>Source</span>
               <select name="source">
                 <option value="apple-music" selected>Apple Music</option>
                 <option value="spotify">Spotify</option>
@@ -81,113 +117,72 @@
         </form>
       </div>
 
-      <div class="tab-content" id="tab-videoId">
-        <form id="form-videoid" class="form">
-          <label>
-            <span>YT Music videoId *</span>
-            <input name="videoId" required placeholder="HaEYUJ2aRHs" value="HaEYUJ2aRHs" />
-          </label>
+      <div class="demo-content" id="demo-videoId">
+        <form id="form-videoid" class="demo-form">
+          <label><span>YT Music videoId</span><input name="videoId" required value="HaEYUJ2aRHs" placeholder="HaEYUJ2aRHs" /></label>
           <button type="submit" class="btn btn-primary">Fetch Lyrics</button>
         </form>
       </div>
 
-      <div class="tab-content" id="tab-search">
-        <form id="form-search" class="form">
-          <label>
-            <span>Search Query *</span>
-            <input name="q" required placeholder="Shape of You Ed Sheeran" value="Shape of You Ed Sheeran" />
-          </label>
+      <div class="demo-content" id="demo-search">
+        <form id="form-search" class="demo-form">
+          <label><span>Search Query</span><input name="q" required value="Shape of You Ed Sheeran" placeholder="Shape of You Ed Sheeran" /></label>
           <button type="submit" class="btn btn-primary">Search</button>
         </form>
       </div>
 
-      <div id="result" class="result hidden">
+      <div class="demo-result hidden" id="result">
         <div class="result-header">
-          <div class="result-info">
-            <h3 id="result-title">Track Title</h3>
-            <p id="result-artist">Artist</p>
+          <div>
+            <div class="result-title" id="result-title">—</div>
+            <div class="result-artist" id="result-artist">—</div>
           </div>
-          <div class="result-provider">
-            <span class="provider-badge" id="result-provider">Provider</span>
-            <span class="track-id" id="result-trackid"></span>
+          <div class="result-badges">
+            <span class="provider-badge" id="result-provider">—</span>
           </div>
         </div>
         <div class="result-stats">
           <div><strong id="stat-plain">0</strong><span>plain chars</span></div>
           <div><strong id="stat-timed">0</strong><span>LRC lines</span></div>
-          <div><strong id="stat-time">0.0s</strong><span>response time</span></div>
+          <div><strong id="stat-time">0.0s</strong><span>response</span></div>
         </div>
-        <div class="lyrics-toggle">
-          <button class="toggle-btn active" data-mode="lrc">LRC (synced)</button>
-          <button class="toggle-btn" data-mode="plain">Plain Text</button>
-          <button class="toggle-btn" data-mode="json">JSON</button>
+        <div class="result-modes">
+          <button class="mode-btn active" data-mode="lrc">LRC</button>
+          <button class="mode-btn" data-mode="plain">Plain</button>
+          <button class="mode-btn" data-mode="json">JSON</button>
         </div>
-        <pre id="result-body" class="result-body"></pre>
-        <div class="copy-url">
-          <span>API URL:</span>
+        <pre class="result-body" id="result-body"></pre>
+        <div class="result-url">
+          <span class="url-label">API URL</span>
           <code id="result-url"></code>
-          <button id="copy-url-btn" class="btn-icon">📋 Copy</button>
+          <button id="copy-url-btn" class="btn-icon">Copy</button>
         </div>
       </div>
     </div>
-  </section>
 
-  <section class="endpoints" id="endpoints">
-    <div class="container">
-      <h2>📡 API Endpoints</h2>
-      <p class="section-desc">Semua endpoint gratis &amp; tanpa rate limit per-request.</p>
-      <div class="endpoint-grid">
-        <div class="endpoint">
-          <span class="method get">GET</span>
-          <code>/lyrics?videoId=XXX</code>
-          <p>Get full lyrics (plain + LRC) dari YT Music videoId</p>
-        </div>
-        <div class="endpoint">
-          <span class="method get">GET</span>
-          <code>/lyrics?title=X&amp;artist=Y&amp;source=PROVIDER</code>
-          <p>Resolve track dari provider apapun + get lyrics</p>
-        </div>
-        <div class="endpoint">
-          <span class="method get">GET</span>
-          <code>/lyrics/plain?videoId=XXX</code>
-          <p>Plain text lyrics (JSON response)</p>
-        </div>
-        <div class="endpoint">
-          <span class="method get">GET</span>
-          <code>/lyrics/lrc?videoId=XXX</code>
-          <p>LRC synced lyrics (<code>text/plain</code>)</p>
-        </div>
-        <div class="endpoint">
-          <span class="method get">GET</span>
-          <code>/lyrics/search?q=XXX</code>
-          <p>Search YT Music + top 5 tracks dengan lyrics</p>
-        </div>
-      </div>
+    <div class="section-header" id="endpoints">
+      <span class="section-title">Code Examples</span>
+      <span class="section-count">copy &amp; paste</span>
     </div>
-  </section>
-
-  <section class="code-examples">
-    <div class="container">
-      <h2>💻 Usage Examples</h2>
-      <div class="code-tabs">
-        <button class="code-tab active" data-lang="js">JavaScript</button>
-        <button class="code-tab" data-lang="curl">cURL</button>
-        <button class="code-tab" data-lang="py">Python</button>
-      </div>
-      <div class="code-block" id="code-js">
+    <div class="code-tabs">
+      <button class="code-tab active" data-lang="js">JavaScript</button>
+      <button class="code-tab" data-lang="curl">cURL</button>
+      <button class="code-tab" data-lang="py">Python</button>
+    </div>
+    <div class="code-block active" id="code-js">
 <pre><code>const API = "https://hitpmqtnvaugyksgubnj.supabase.co/functions/v1/lyrics";
 
-// Dari videoId
-const data = await fetch(`${API}?videoId=HaEYUJ2aRHs`).then(r => r.json());
+// From videoId
+const data = await fetch(`${API}?videoId=HaEYUJ2aRHs`).then(r =&gt; r.json());
 console.log(data.provider); // "Musixmatch"
 console.log(data.lrc);      // LRC string
 
-// Dari track metadata
+// From track metadata (Spotify, Apple Music, etc)
 const url = new URL(API);
 url.searchParams.set("title", "Blinding Lights");
 url.searchParams.set("artist", "The Weeknd");
 url.searchParams.set("source", "apple-music");
-const result = await fetch(url).then(r => r.json());
+const result = await fetch(url).then(r =&gt; r.json());
 console.log(result.resolved.videoId); // "J7p4bzqLvCw"
 
 // Audio player integration
@@ -200,11 +195,11 @@ class LyricsPlayer {
       u.searchParams.set("artist", track.artist);
       u.searchParams.set("source", track.source || "spotify");
     }
-    return await fetch(u).then(r => r.json());
+    return await fetch(u).then(r =&gt; r.json());
   }
 
   parseLrc(lrc) {
-    return lrc.split("\n").reduce((acc, line) => {
+    return lrc.split("\n").reduce((acc, line) =&gt; {
       const m = line.match(/\[(\d+):(\d+)\.(\d+)\](.*)/);
       if (m) {
         const [, mm, ss, cs, text] = m;
@@ -214,8 +209,8 @@ class LyricsPlayer {
     }, []);
   }
 }</code></pre>
-      </div>
-      <div class="code-block hidden" id="code-curl">
+    </div>
+    <div class="code-block" id="code-curl">
 <pre><code># Get by videoId
 curl "https://hitpmqtnvaugyksgubnj.supabase.co/functions/v1/lyrics?videoId=HaEYUJ2aRHs"
 
@@ -227,8 +222,8 @@ curl "https://hitpmqtnvaugyksgubnj.supabase.co/functions/v1/lyrics/lrc?videoId=H
 
 # Search YT Music
 curl "https://hitpmqtnvaugyksgubnj.supabase.co/functions/v1/lyrics/search?q=Shape+of+You"</code></pre>
-      </div>
-      <div class="code-block hidden" id="code-py">
+    </div>
+    <div class="code-block" id="code-py">
 <pre><code>import requests
 
 API = "https://hitpmqtnvaugyksgubnj.supabase.co/functions/v1/lyrics"
@@ -261,43 +256,38 @@ def parse_lrc(lrc):
                 "text": text
             })
     return lines</code></pre>
+    </div>
+
+    <div class="section-header">
+      <span class="section-title">Project Stats</span>
+      <span class="section-count">52 tracks tested</span>
+    </div>
+    <div class="project-grid">
+      <div class="project-card">
+        <div class="project-name">12+ Music Providers</div>
+        <div class="project-desc">Apple Music, Spotify, Tidal, Deezer, Amazon Music, JioSaavn, Gaana, LangitMusik, Niconico, Letras, Pandora, YouTube Music.</div>
+      </div>
+      <div class="project-card">
+        <div class="project-name">2 Lyrics Sources</div>
+        <div class="project-desc">Hanya dari <strong>LyricFind</strong> (53.8%) dan <strong>Musixmatch</strong> (46.2%). Resmi, legal, akurat.</div>
+      </div>
+      <div class="project-card">
+        <div class="project-name">100% LRC Synced</div>
+        <div class="project-desc">Semua 52 track test return LRC synced lyrics (rata-rata 60 lines per track). Cocok untuk karaoke &amp; video player.</div>
+      </div>
+      <div class="project-card">
+        <div class="project-name">~1.2s Response</div>
+        <div class="project-desc">Rata-rata response time 1.2 detik via global CDN edge. Tidak ada rate limit per-request.</div>
       </div>
     </div>
-  </section>
+  </main>
 
-  <section class="providers">
-    <div class="container">
-      <h2>🌐 Supported Music Providers</h2>
-      <p class="section-desc">Cari track dari provider apapun, lyrics dari LyricFind &amp; Musixmatch.</p>
-      <div class="provider-grid">
-        <div class="provider-card">🎵 Apple Music</div>
-        <div class="provider-card">🟢 Spotify</div>
-        <div class="provider-card">🌊 Tidal</div>
-        <div class="provider-card">🎧 Deezer</div>
-        <div class="provider-card">📦 Amazon Music</div>
-        <div class="provider-card">🎼 Pandora</div>
-        <div class="provider-card">🇮🇩 LangitMusik</div>
-        <div class="provider-card">🇮🇳 JioSaavn</div>
-        <div class="provider-card">🇮🇳 Gaana</div>
-        <div class="provider-card">🇯🇵 Niconico</div>
-        <div class="provider-card">📝 Letras</div>
-        <div class="provider-card">▶️ YouTube Music</div>
-      </div>
-    </div>
-  </section>
-
-  <footer class="footer">
-    <div class="container">
-      <p>
-        <strong>Liriqo Lyrics API</strong> — Powered by
-        <a href="https://github.com/sigma67/ytmusicapi" target="_blank" rel="noopener">YouTube Music InnerTube</a>.
-        Lyrics from <a href="https://www.lyricfind.com/" target="_blank" rel="noopener">LyricFind</a> &
-        <a href="https://www.musixmatch.com/" target="_blank" rel="noopener">Musixmatch</a>.
-      </p>
-      <p class="footer-meta">© 2026 Liriqo — MIT License</p>
-    </div>
+  <footer>
+    <p>Liriqo Lyrics API — built with ❤️ by <a href="https://github.com/liriqo">liriqo</a></p>
+    <p class="footer-meta">Powered by YouTube Music InnerTube · Lyrics by LyricFind &amp; Musixmatch · MIT License</p>
   </footer>
+</div>
 
-  <script src="app.js"></script>
+<script src="app.js"></script>
 </body>
-  </html>
+</html>
