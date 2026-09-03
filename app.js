@@ -1,6 +1,6 @@
 // Liriqo Lyrics API — Frontend (Live data from Supabase)
-const LYRICS_API = "https://hitpmqtnvaugyksgubnj.supabase.co/functions/v1/lyrics";
-const STATS_API  = "https://hitpmqtnvaugyksgubnj.supabase.co/functions/v1/stats";
+const LYRICS_API = "https://kkwehlfmisoenatxpank.supabase.co/functions/v1/lyrics";
+const STATS_API  = "https://kkwehlfmisoenatxpank.supabase.co/functions/v1/stats";
 
 const ENDPOINTS = [
   { provider: "LyricFind/Musixmatch", method: "GET", path: "/lyrics?videoId=XXX" },
