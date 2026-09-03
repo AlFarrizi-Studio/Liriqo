@@ -139,8 +139,6 @@ function animateValue(el, to, duration = 600) {
 const LOG_PAGE = 10;
 let _log = [];
 let _lastLogTimestamp = null;
-let _logExpanded = false;
-let _collapsedHeight = null;
 
 function setLog(entries) {
   _log = entries || [];
@@ -181,8 +179,6 @@ function renderLog() {
   const tbody = document.getElementById("log-tbody");
   const emptyEl = document.getElementById("log-empty");
   const countEl = document.getElementById("log-count");
-  const toggleBtn = document.getElementById("log-toggle");
-  const wrapEl = document.getElementById("log-table-wrap");
 
   countEl.textContent = `${_log.length} entr${_log.length === 1 ? "y" : "ies"} · live · max 100`;
   emptyEl.style.display = _log.length ? "none" : "block";
@@ -195,48 +191,9 @@ function renderLog() {
     tbody.appendChild(tr);
   });
   if (newest) _lastLogTimestamp = newest;
-
-  if (_log.length > LOG_PAGE) {
-    toggleBtn.style.display = "flex";
-    if (_collapsedHeight === null) {
-      wrapEl.style.maxHeight = "none";
-      const allRows = tbody.querySelectorAll("tr");
-      let height = 0;
-      for (let i = 0; i < Math.min(LOG_PAGE, allRows.length); i++) {
-        height += allRows[i].getBoundingClientRect().height;
-      }
-      const thead = wrapEl.querySelector("thead");
-      if (thead) height += thead.getBoundingClientRect().height;
-      _collapsedHeight = Math.ceil(height) + 1;
-      wrapEl.style.removeProperty("max-height");
-      wrapEl.style.setProperty("--collapsed-height", _collapsedHeight + "px");
-    }
-  } else {
-    toggleBtn.style.display = "none";
-    wrapEl.classList.remove("collapsed");
-    wrapEl.classList.add("expanded");
-  }
 }
 
-function initLogToggle() {
-  const btn = document.getElementById("log-toggle");
-  const wrapEl = document.getElementById("log-table-wrap");
-
-  btn.addEventListener("click", () => {
-    _logExpanded = !_logExpanded;
-    if (_logExpanded) {
-      wrapEl.classList.remove("collapsed");
-      wrapEl.classList.add("expanded");
-      btn.classList.add("expanded");
-      btn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg> Show less`;
-    } else {
-      wrapEl.classList.remove("expanded");
-      wrapEl.classList.add("collapsed");
-      btn.classList.remove("expanded");
-      btn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg> Show more`;
-    }
-  });
-}
+function initLogToggle() {}
 
 // ===== Performance Charts (live data) =====
 const PERF_WINDOW = 30;
