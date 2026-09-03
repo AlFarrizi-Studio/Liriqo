@@ -8,8 +8,6 @@ Live lyrics API powered by YouTube Music InnerTube. Pull LRC-synced or plain lyr
 
 ## API Endpoints
 
-Base URL: `https://kkwehlfmisoenatxpank.supabase.co/functions/v1`
-
 | Method | Path | Description |
 |---|---|---|
 | `GET` | `/lyrics?videoId=XXX` | Full lyrics (plain + LRC) by YT Music videoId |
