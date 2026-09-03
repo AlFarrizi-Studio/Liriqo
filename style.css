@@ -974,7 +974,7 @@ nav {
   overflow: auto;
   border-radius: var(--radius);
   border: 1px solid var(--border);
-  max-height: 480px;
+  max-height: 600px;
   scrollbar-width: thin;
   scrollbar-color: var(--border-hover) transparent;
 }
@@ -996,20 +996,29 @@ nav {
 
 .log-table {
   width: 100%;
+  min-width: 1100px;
   border-collapse: collapse;
   font-family: 'JetBrains Mono', monospace;
-  font-size: 0.75rem;
+  font-size: 0.78rem;
   table-layout: fixed;
 }
 
+.log-table th:nth-child(1),
+.log-table td:nth-child(1) { width: 70px; }
 .log-table th:nth-child(2),
 .log-table td:nth-child(2) { width: 22%; }
 .log-table th:nth-child(3),
 .log-table td:nth-child(3) { width: 18%; }
 .log-table th:nth-child(4),
-.log-table td:nth-child(4) { width: 11%; }
+.log-table td:nth-child(4) { width: 110px; }
 .log-table th:nth-child(5),
-.log-table td:nth-child(5) { width: 22%; }
+.log-table td:nth-child(5) { width: 28%; }
+.log-table th:nth-child(6),
+.log-table td:nth-child(6) { width: 110px; }
+.log-table th:nth-child(7),
+.log-table td:nth-child(7) { width: 80px; }
+.log-table th:nth-child(8),
+.log-table td:nth-child(8) { width: 90px; }
 
 .log-table thead th {
   background: var(--bg-card);
@@ -1037,12 +1046,11 @@ nav {
 .log-row-new { animation: rowFlash 1.2s ease both; }
 
 .log-table td {
-  padding: 9px 14px;
+  padding: 11px 16px;
   color: var(--text-muted);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 200px;
 }
 
 .log-status {
@@ -1075,7 +1083,6 @@ nav {
 .log-track {
   color: var(--text-main);
   font-weight: 500;
-  max-width: 240px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1085,7 +1092,6 @@ nav {
   color: var(--text-muted);
   font-size: 0.7rem;
   font-weight: 400;
-  max-width: 200px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1116,7 +1122,9 @@ nav {
 
 .log-endpoint {
   color: var(--accent);
-  max-width: 180px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .log-ip {
