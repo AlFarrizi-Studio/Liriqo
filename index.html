@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Liriqo Lyrics API</title>
+  <title>LIRIQO Lyrics API</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
@@ -17,7 +17,7 @@
 
   <nav>
     <div class="brand">
-      Liriqo Lyrics API
+      LIRIQO
       <span class="pill pill-version">v1.0.0</span>
       <span class="pill pill-live">Live</span>
     </div>
@@ -27,7 +27,7 @@
   </nav>
 
   <header class="hero">
-    <p class="hero-eyebrow">Free Forever · 500K invocations/month · Multi-provider</p>
+    <p class="hero-eyebrow">Free Forever · No auth · CORS-enabled</p>
     <h1>Lyrics API</h1>
     <p>Fetch synced and plain lyrics from <strong>LyricFind</strong> &amp; <strong>Musixmatch</strong> via YouTube Music InnerTube. Resolve tracks from 12+ music providers.</p>
   </header>
@@ -72,58 +72,48 @@
       <span class="section-title">Provider Performance</span>
       <span class="section-count">last 30 requests · live</span>
     </div>
-    <div class="perf-charts" id="perf-charts">
-      <div class="perf-chart-card lyricfind">
-        <div class="perf-chart-header">
-          <div>
-            <div class="perf-chart-name">LyricFind</div>
-            <div class="perf-chart-meta">
-              <span id="lf-current">0</span> requests ·
-              <span id="lf-avg">0</span>ms avg ·
+    <div class="perf-chart-card combined" id="perf-chart-combined">
+      <div class="perf-chart-header">
+        <div class="perf-chart-legend">
+          <div class="legend-item">
+            <span class="legend-dot lyricfind-dot"></span>
+            <span class="legend-label">LyricFind</span>
+            <span class="legend-meta">
+              <span id="lf-current">0</span> ·
+              <span id="lf-avg">0</span>ms ·
               <span id="lf-trend" class="trend-neutral">— 0%</span>
-            </div>
+            </span>
           </div>
-          <div class="perf-chart-badge lyricfind-badge">GREEN</div>
-        </div>
-        <svg class="perf-svg" id="lf-svg" viewBox="0 0 600 120" preserveAspectRatio="none">
-          <defs>
-            <linearGradient id="lf-grad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#22c55e" stop-opacity="0.4" />
-              <stop offset="100%" stop-color="#22c55e" stop-opacity="0" />
-            </linearGradient>
-          </defs>
-          <g class="perf-grid"></g>
-          <path class="perf-area" fill="url(#lf-grad)" />
-          <path class="perf-line lyricfind" stroke="#22c55e" fill="none" stroke-width="2" />
-          <g class="perf-points"></g>
-        </svg>
-      </div>
-
-      <div class="perf-chart-card musixmatch">
-        <div class="perf-chart-header">
-          <div>
-            <div class="perf-chart-name">Musixmatch</div>
-            <div class="perf-chart-meta">
-              <span id="mxm-current">0</span> requests ·
-              <span id="mxm-avg">0</span>ms avg ·
+          <div class="legend-item">
+            <span class="legend-dot musixmatch-dot"></span>
+            <span class="legend-label">Musixmatch</span>
+            <span class="legend-meta">
+              <span id="mxm-current">0</span> ·
+              <span id="mxm-avg">0</span>ms ·
               <span id="mxm-trend" class="trend-neutral">— 0%</span>
-            </div>
+            </span>
           </div>
-          <div class="perf-chart-badge musixmatch-badge">YELLOW</div>
         </div>
-        <svg class="perf-svg" id="mxm-svg" viewBox="0 0 600 120" preserveAspectRatio="none">
-          <defs>
-            <linearGradient id="mxm-grad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#eab308" stop-opacity="0.4" />
-              <stop offset="100%" stop-color="#eab308" stop-opacity="0" />
-            </linearGradient>
-          </defs>
-          <g class="perf-grid"></g>
-          <path class="perf-area" fill="url(#mxm-grad)" />
-          <path class="perf-line musixmatch" stroke="#eab308" fill="none" stroke-width="2" />
-          <g class="perf-points"></g>
-        </svg>
       </div>
+      <svg class="perf-svg" id="perf-svg" viewBox="0 0 600 160" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="lf-grad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#22c55e" stop-opacity="0.3" />
+            <stop offset="100%" stop-color="#22c55e" stop-opacity="0" />
+          </linearGradient>
+          <linearGradient id="mxm-grad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#eab308" stop-opacity="0.3" />
+            <stop offset="100%" stop-color="#eab308" stop-opacity="0" />
+          </linearGradient>
+        </defs>
+        <g class="perf-grid"></g>
+        <path class="perf-area lf-area" fill="url(#lf-grad)" />
+        <path class="perf-area mxm-area" fill="url(#mxm-grad)" />
+        <path class="perf-line lyricfind-line" stroke="#22c55e" fill="none" stroke-width="2" />
+        <path class="perf-line musixmatch-line" stroke="#eab308" fill="none" stroke-width="2" />
+        <g class="perf-points lf-points"></g>
+        <g class="perf-points mxm-points"></g>
+      </svg>
     </div>
 
     <div class="section-header">
