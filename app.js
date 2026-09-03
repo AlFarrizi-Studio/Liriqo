@@ -3,12 +3,14 @@ const LYRICS_API = "https://kkwehlfmisoenatxpank.supabase.co/functions/v1/lyrics
 const STATS_API  = "https://kkwehlfmisoenatxpank.supabase.co/functions/v1/stats";
 
 const ENDPOINTS = [
-  { provider: "LyricFind/Musixmatch", method: "GET", path: "/lyrics?videoId=XXX", full: "https://kkwehlfmisoenatxpank.supabase.co/functions/v1/lyrics" },
-  { provider: "Multi-provider", method: "GET", path: "/lyrics?title=X&artist=Y&source=...", full: "https://kkwehlfmisoenatxpank.supabase.co/functions/v1/lyrics" },
-  { provider: "Plain text only", method: "GET", path: "/lyrics/plain?videoId=XXX", full: "https://kkwehlfmisoenatxpank.supabase.co/functions/v1/lyrics" },
-  { provider: "LRC synced", method: "GET", path: "/lyrics/lrc?videoId=XXX", full: "https://kkwehlfmisoenatxpank.supabase.co/functions/v1/lyrics" },
-  { provider: "Search + top 5", method: "GET", path: "/lyrics/search?q=XXX", full: "https://kkwehlfmisoenatxpank.supabase.co/functions/v1/lyrics" },
+  { provider: "LyricFind/Musixmatch", method: "GET", path: "/lyrics?videoId=XXX" },
+  { provider: "Multi-provider", method: "GET", path: "/lyrics?title=X&artist=Y&source=..." },
+  { provider: "Plain text only", method: "GET", path: "/lyrics/plain?videoId=XXX" },
+  { provider: "LRC synced", method: "GET", path: "/lyrics/lrc?videoId=XXX" },
+  { provider: "Search + top 5", method: "GET", path: "/lyrics/search?q=XXX" },
 ];
+
+const API_BASE_URL = "https://kkwehlfmisoenatxpank.supabase.co/functions/v1/lyrics";
 
 // ===== Render Endpoints =====
 function renderEndpoints() {
@@ -24,30 +26,24 @@ function renderEndpoints() {
         <div class="endpoint-path">${ep.path}</div>
         <div class="endpoint-provider">${ep.provider}</div>
       </div>
-      <button class="btn-copy" data-url="${ep.full}" title="Copy base URL">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-        </svg>
-      </button>
     `;
     grid.appendChild(card);
   });
-  grid.querySelectorAll(".btn-copy").forEach((btn) => {
-    btn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      const url = btn.getAttribute("data-url");
-      navigator.clipboard.writeText(url).then(() => {
-        btn.classList.add("copied");
-        const original = btn.innerHTML;
-        btn.innerHTML = "✓";
+
+  const copyBtn = document.getElementById("api-endpoint-copy");
+  if (copyBtn) {
+    copyBtn.addEventListener("click", () => {
+      navigator.clipboard.writeText(API_BASE_URL).then(() => {
+        copyBtn.classList.add("copied");
+        const original = copyBtn.innerHTML;
+        copyBtn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Copied!`;
         setTimeout(() => {
-          btn.classList.remove("copied");
-          btn.innerHTML = original;
-        }, 1200);
+          copyBtn.classList.remove("copied");
+          copyBtn.innerHTML = original;
+        }, 1500);
       });
     });
-  });
+  }
 }
 
 // ===== Render Lyric Providers (static info card, stats pulled live) =====
@@ -68,14 +64,8 @@ function renderLyricProviders() {
   const grid = document.getElementById("lyric-provider-grid");
   grid.innerHTML = "";
   const logos = {
-    lyricfind: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" class="provider-logo-svg">
-      <circle cx="50" cy="50" r="45" fill="#22c55e"/>
-      <text x="50" y="62" font-size="32" font-weight="700" text-anchor="middle" fill="white" font-family="Inter, sans-serif">LF</text>
-    </svg>`,
-    musixmatch: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" class="provider-logo-svg">
-      <circle cx="50" cy="50" r="45" fill="#eab308"/>
-      <text x="50" y="62" font-size="32" font-weight="700" text-anchor="middle" fill="white" font-family="Inter, sans-serif">MM</text>
-    </svg>`,
+    lyricfind: `<img src="https://images.squarespace-cdn.com/content/v1/5f972a7c930e1b7910954135/bc30c843-deca-4279-8c2f-5fd86336b97d/Press-Image_LF.jpg" alt="LyricFind" class="provider-logo-img" referrerpolicy="no-referrer" />`,
+    musixmatch: `<img src="https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e3/Musixmatch_logo_icon_only.svg/3840px-Musixmatch_logo_icon_only.svg.png" alt="Musixmatch" class="provider-logo-img" referrerpolicy="no-referrer" />`,
   };
   Object.values(LYRIC_PROVIDER_INFO).forEach((p) => {
     const card = document.createElement("div");
@@ -293,15 +283,17 @@ function renderChart(provider) {
   if (!svg) return;
 
   const w = 600;
-  const h = 160;
+  const h = 180;
   const data = perfData[provider];
   const color = provider === "lyricfind" ? "#22c55e" : "#eab308";
 
   if (provider === "lyricfind") {
     const grid = svg.querySelector(".perf-grid");
     grid.innerHTML = "";
-    for (let i = 0; i < 4; i++) {
-      const y = (h / 4) * i;
+    const yLines = svg.querySelector(".perf-yaxis-lines");
+    yLines.innerHTML = "";
+    for (let i = 0; i < 6; i++) {
+      const y = (h / 5) * i;
       const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
       line.setAttribute("x1", 0);
       line.setAttribute("y1", y);
