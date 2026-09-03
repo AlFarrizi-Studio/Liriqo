@@ -108,7 +108,7 @@ function updateLyricProviderStats(providers) {
 }
 
 // ===== Stats Animation =====
-function animateValue(el, to, duration = 600) {
+function animateValue(el, to, duration = 700) {
   const from = parseFloat(el.dataset.rawValue ?? to);
   el.dataset.rawValue = to;
   if (isNaN(to)) {
@@ -120,6 +120,9 @@ function animateValue(el, to, duration = 600) {
     return;
   }
   const startTime = performance.now();
+  el.classList.add("counting");
+  el.classList.remove("changed");
+  void el.offsetWidth;
   function step(now) {
     const progress = Math.min((now - startTime) / duration, 1);
     const eased = 1 - Math.pow(1 - progress, 3);
@@ -127,8 +130,7 @@ function animateValue(el, to, duration = 600) {
     if (progress < 1) {
       requestAnimationFrame(step);
     } else {
-      el.classList.remove("changed");
-      void el.offsetWidth;
+      el.classList.remove("counting");
       el.classList.add("changed");
     }
   }
@@ -264,6 +266,9 @@ function renderChart(provider) {
   const areaPath = svg.querySelector(`.${provider === "lyricfind" ? "lf" : "mxm"}-area`);
   linePath.setAttribute("d", buildPath(data, w, h));
   areaPath.setAttribute("d", buildAreaPath(data, w, h));
+  linePath.style.animation = "none";
+  void linePath.getBoundingClientRect();
+  linePath.style.animation = "";
 
   const pointsG = svg.querySelector(`.${provider === "lyricfind" ? "lf" : "mxm"}-points`);
   pointsG.innerHTML = "";
