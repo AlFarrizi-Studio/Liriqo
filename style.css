@@ -205,8 +205,25 @@ nav {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, transform 0.2s;
+  animation: fadeInUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+  position: relative;
+  overflow: hidden;
 }
+.stat-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.04) 50%, transparent 70%);
+  background-size: 200% 100%;
+  animation: shimmer 6s linear infinite;
+  pointer-events: none;
+}
+.stat-card:nth-child(1) { animation-delay: 0.02s; }
+.stat-card:nth-child(2) { animation-delay: 0.06s; }
+.stat-card:nth-child(3) { animation-delay: 0.10s; }
+.stat-card:nth-child(4) { animation-delay: 0.14s; }
+.stat-card:hover { transform: translateY(-2px); border-color: var(--border-hover); }
 .stat-card:hover { border-color: var(--border-hover); }
 
 .stat-label {
@@ -240,7 +257,44 @@ nav {
   from { transform: translateY(60%); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }
 }
-.stat-value.changed { animation: slideUp 0.35s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.stat-value.changed { animation: slideUp 0.45s cubic-bezier(0.22, 1, 0.36, 1) both; }
+
+@keyframes countPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+  100% { transform: scale(1); }
+}
+.stat-value.counting { animation: countPulse 0.6s ease-out; }
+
+@keyframes fadeInUp {
+  from { transform: translateY(8px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes drawLine {
+  from { stroke-dashoffset: var(--line-length, 1000); }
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes pointAppear {
+  from { transform: scale(0); opacity: 0; }
+  to { transform: scale(1); opacity: 0.6; }
+}
+
+@keyframes glowPulse {
+  0%, 100% { filter: drop-shadow(0 0 0 transparent); }
+  50% { filter: drop-shadow(0 0 6px currentColor); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes barFill {
+  from { width: 0; }
+  to { width: var(--bar-width, 100%); }
+}
 
 /* ===== SECTION HEADERS ===== */
 .section-header {
@@ -251,6 +305,7 @@ nav {
   padding-bottom: 14px;
   border-bottom: 1px solid var(--border);
   margin-top: 30px;
+  animation: fadeInUp 0.4s ease both;
 }
 
 .section-title {
@@ -296,7 +351,13 @@ nav {
   gap: 14px;
   transition: all 0.18s ease;
   position: relative;
+  animation: fadeInUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
+.endpoint-card:nth-child(1) { animation-delay: 0.04s; }
+.endpoint-card:nth-child(2) { animation-delay: 0.08s; }
+.endpoint-card:nth-child(3) { animation-delay: 0.12s; }
+.endpoint-card:nth-child(4) { animation-delay: 0.16s; }
+.endpoint-card:nth-child(5) { animation-delay: 0.20s; }
 .endpoint-card:hover {
   border-color: var(--border-hover);
   background: var(--bg-card-hover);
@@ -459,8 +520,11 @@ nav {
   display: flex;
   flex-direction: column;
   gap: 14px;
-  transition: all 0.18s;
+  transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+  animation: fadeInUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
+.lyric-provider-card:nth-child(1) { animation-delay: 0.06s; }
+.lyric-provider-card:nth-child(2) { animation-delay: 0.12s; }
 .lyric-provider-card:hover {
   border-color: var(--border-hover);
   background: var(--bg-card-hover);
@@ -677,17 +741,27 @@ nav {
 }
 
 .perf-line {
-  transition: d 0.4s ease;
+  transition: d 0.5s ease, stroke-width 0.2s ease;
   stroke-linejoin: round;
   stroke-linecap: round;
+  stroke-dasharray: 2000;
+  stroke-dashoffset: 2000;
+  animation: drawLine 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
+.perf-line.lyricfind-line { animation-delay: 0.1s; }
+.perf-line.musixmatch-line { animation-delay: 0.2s; }
 
 .perf-area {
-  transition: d 0.4s ease;
+  transition: d 0.5s ease;
+  opacity: 0;
+  animation: fadeInUp 0.8s ease 0.3s forwards;
 }
 
 .perf-points circle {
-  transition: cx 0.4s ease, cy 0.4s ease, r 0.2s;
+  transition: cx 0.5s ease, cy 0.5s ease, r 0.2s;
+  transform-origin: center;
+  transform-box: fill-box;
+  animation: pointAppear 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 
 .perf-grid line {
@@ -1034,16 +1108,17 @@ nav {
 
 .log-table tbody tr {
   border-bottom: 1px solid var(--border);
-  transition: background 0.15s;
+  transition: background 0.15s, transform 0.2s;
 }
 .log-table tbody tr:last-child { border-bottom: none; }
-.log-table tbody tr:hover { background: var(--bg-card-hover); }
+.log-table tbody tr:hover { background: var(--bg-card-hover); transform: translateX(2px); }
 
 @keyframes rowFlash {
-  from { background: rgba(79, 142, 247, 0.12); }
-  to { background: transparent; }
+  0% { background: rgba(79, 142, 247, 0.18); }
+  60% { background: rgba(79, 142, 247, 0.06); }
+  100% { background: transparent; }
 }
-.log-row-new { animation: rowFlash 1.2s ease both; }
+.log-row-new { animation: rowFlash 1.4s ease both, fadeInUp 0.4s ease both; }
 
 .log-table td {
   padding: 11px 16px;
@@ -1140,6 +1215,9 @@ nav {
   color: var(--text-dim);
   font-size: 0.82rem;
   font-family: 'Inter', sans-serif;
+  background: linear-gradient(90deg, transparent 0%, rgba(79, 142, 247, 0.04) 50%, transparent 100%);
+  background-size: 200% 100%;
+  animation: shimmer 3s linear infinite;
 }
 
 /* ===== FOOTER ===== */
