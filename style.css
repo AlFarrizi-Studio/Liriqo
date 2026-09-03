@@ -365,6 +365,40 @@ nav {
   margin-top: 2px;
 }
 
+/* ===== API BASE URL BAR ===== */
+.api-base-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+.api-base-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-dim);
+  font-weight: 600;
+  flex-shrink: 0;
+}
+.api-base-url {
+  flex: 1;
+  min-width: 200px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  color: var(--accent);
+  background: var(--bg-base);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 6px 10px;
+  word-break: break-all;
+}
+
 /* ===== PROVIDER GRID ===== */
 .provider-grid {
   display: grid;
@@ -443,14 +477,19 @@ nav {
 }
 
 .lyric-provider-logo {
-  width: 36px;
-  height: 36px;
+  width: 44px;
+  height: 44px;
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.provider-logo-svg {
+.provider-logo-img {
   width: 100%;
   height: 100%;
+  object-fit: cover;
+  border-radius: 10px;
   display: block;
 }
 
@@ -530,11 +569,13 @@ nav {
 .perf-chart-legend {
   display: flex;
   flex-wrap: wrap;
-  gap: 24px;
+  gap: 32px;
   width: 100%;
   font-family: 'JetBrains Mono', monospace;
-  font-size: 0.72rem;
+  font-size: 0.78rem;
   color: var(--text-muted);
+  justify-content: center;
+  align-items: center;
 }
 
 .legend-item {
@@ -608,7 +649,30 @@ nav {
 
 .perf-svg {
   width: 100%;
-  height: 160px;
+  height: 180px;
+  display: block;
+}
+
+.perf-chart-wrap {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+}
+
+.perf-chart-yaxis {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  color: var(--text-dim);
+  padding: 4px 0;
+  text-align: right;
+  min-width: 38px;
+  line-height: 1;
+}
+
+.perf-chart-yaxis span {
   display: block;
 }
 
