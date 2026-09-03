@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>LIRIQO Lyrics API</title>
+  <title>Liriqo Lyrics API · LIRIQO</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
@@ -17,7 +17,7 @@
 
   <nav>
     <div class="brand">
-      LIRIQO
+      Liriqo Lyrics API
       <span class="pill pill-version">v1.0.0</span>
       <span class="pill pill-live">Live</span>
     </div>
@@ -28,8 +28,8 @@
 
   <header class="hero">
     <p class="hero-eyebrow">Free Forever · No auth · CORS-enabled</p>
-    <h1>Lyrics API</h1>
-    <p>Fetch synced and plain lyrics from <strong>LyricFind</strong> &amp; <strong>Musixmatch</strong> via YouTube Music InnerTube. Resolve tracks from 12+ music providers.</p>
+    <h1>LIRIQO</h1>
+    <p>Real-time lyrics resolver powered by YouTube Music InnerTube. Pull LRC-synced or plain lyrics from LyricFind and Musixmatch, identify any track in milliseconds, and serve a single JSON response from one stable URL.</p>
   </header>
 
   <section class="stats-bar" id="stats-bar">
@@ -59,6 +59,17 @@
     <div class="section-header">
       <span class="section-title">API Endpoints</span>
       <span class="section-count" id="endpoint-count">5 routes</span>
+    </div>
+    <div class="api-base-bar">
+      <span class="api-base-label">Base URL</span>
+      <code class="api-base-url" id="api-base-url">https://kkwehlfmisoenatxpank.supabase.co/functions/v1/lyrics</code>
+      <button class="btn-copy" id="api-endpoint-copy" title="Copy base URL">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+        </svg>
+        Copy
+      </button>
     </div>
     <div class="endpoint-grid" id="endpoint-grid"></div>
 
@@ -95,25 +106,36 @@
           </div>
         </div>
       </div>
-      <svg class="perf-svg" id="perf-svg" viewBox="0 0 600 160" preserveAspectRatio="none">
-        <defs>
-          <linearGradient id="lf-grad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#22c55e" stop-opacity="0.3" />
-            <stop offset="100%" stop-color="#22c55e" stop-opacity="0" />
-          </linearGradient>
-          <linearGradient id="mxm-grad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#eab308" stop-opacity="0.3" />
-            <stop offset="100%" stop-color="#eab308" stop-opacity="0" />
-          </linearGradient>
-        </defs>
-        <g class="perf-grid"></g>
-        <path class="perf-area lf-area" fill="url(#lf-grad)" />
-        <path class="perf-area mxm-area" fill="url(#mxm-grad)" />
-        <path class="perf-line lyricfind-line" stroke="#22c55e" fill="none" stroke-width="2" />
-        <path class="perf-line musixmatch-line" stroke="#eab308" fill="none" stroke-width="2" />
-        <g class="perf-points lf-points"></g>
-        <g class="perf-points mxm-points"></g>
-      </svg>
+      <div class="perf-chart-wrap">
+        <div class="perf-chart-yaxis" id="perf-yaxis">
+          <span>100ms</span>
+          <span>80ms</span>
+          <span>60ms</span>
+          <span>40ms</span>
+          <span>20ms</span>
+          <span>0ms</span>
+        </div>
+        <svg class="perf-svg" id="perf-svg" viewBox="0 0 600 180" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="lf-grad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#22c55e" stop-opacity="0.3" />
+              <stop offset="100%" stop-color="#22c55e" stop-opacity="0" />
+            </linearGradient>
+            <linearGradient id="mxm-grad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#eab308" stop-opacity="0.3" />
+              <stop offset="100%" stop-color="#eab308" stop-opacity="0" />
+            </linearGradient>
+          </defs>
+          <g class="perf-grid"></g>
+          <g class="perf-yaxis-lines"></g>
+          <path class="perf-area lf-area" fill="url(#lf-grad)" />
+          <path class="perf-area mxm-area" fill="url(#mxm-grad)" />
+          <path class="perf-line lyricfind-line" stroke="#22c55e" fill="none" stroke-width="2" />
+          <path class="perf-line musixmatch-line" stroke="#eab308" fill="none" stroke-width="2" />
+          <g class="perf-points lf-points"></g>
+          <g class="perf-points mxm-points"></g>
+        </svg>
+      </div>
     </div>
 
     <div class="section-header">
