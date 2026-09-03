@@ -295,15 +295,17 @@ function renderChart(provider) {
   document.getElementById(prefix + "-current").textContent = stats.current;
   document.getElementById(prefix + "-avg").textContent = stats.avg;
   const trendEl = document.getElementById(prefix + "-trend");
-  if (stats.trend > 5) {
+  const trendVal = stats.trend;
+  const arrow = trendVal > 0.5 ? "↑" : trendVal < -0.5 ? "↓" : "—";
+  if (trendVal > 5) {
     trendEl.className = "trend-down";
-    trendEl.textContent = `↑ ${Math.abs(stats.trend).toFixed(1)}%`;
-  } else if (stats.trend < -5) {
+    trendEl.textContent = `${arrow} ${Math.abs(trendVal).toFixed(1)}%`;
+  } else if (trendVal < -5) {
     trendEl.className = "trend-up";
-    trendEl.textContent = `↓ ${Math.abs(stats.trend).toFixed(1)}%`;
+    trendEl.textContent = `${arrow} ${Math.abs(trendVal).toFixed(1)}%`;
   } else {
     trendEl.className = "trend-neutral";
-    trendEl.textContent = `— ${Math.abs(stats.trend).toFixed(1)}%`;
+    trendEl.textContent = `${arrow} ${Math.abs(trendVal).toFixed(1)}%`;
   }
 }
 
