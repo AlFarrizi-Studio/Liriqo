@@ -10,7 +10,7 @@ const ENDPOINTS = [
   { provider: "Search + top 5", method: "GET", path: "/lyrics/search?q=XXX" },
 ];
 
-const API_BASE_URL = "https://kkwehlfmisoenatxpank.supabase.co/functions/v1/lyrics";
+const API_BASE_URL = "https://api-liriqo.runs-on.dev/alfarrizi/v1/lyrics";
 
 // ===== Render Endpoints =====
 function renderEndpoints() {
