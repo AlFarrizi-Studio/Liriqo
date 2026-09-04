@@ -25,14 +25,14 @@ No auth, CORS-enabled. Free forever.
 
 ```bash
 # Full lyrics
-curl "https://kkwehlfmisoenatxpank.supabase.co/functions/v1/lyrics?videoId=HaEYUJ2aRHs"
+curl "https://api-liriqo.runs-on.dev/alfarrizi/v1/lyrics?videoId=HaEYUJ2aRHs"
 
 # LRC synced
-curl "https://kkwehlfmisoenatxpank.supabase.co/functions/v1/lyrics/lrc?videoId=HaEYUJ2aRHs"
+curl "https://api-liriqo.runs-on.dev/alfarrizi/v1/lyrics/lrc?videoId=HaEYUJ2aRHs"
 ```
 
 ```js
-const res = await fetch('https://kkwehlfmisoenatxpank.supabase.co/functions/v1/lyrics?videoId=HaEYUJ2aRHs');
+const res = await fetch('https://api-liriqo.runs-on.dev/alfarrizi/v1/lyrics?videoId=HaEYUJ2aRHs');
 const data = await res.json();
 // data.title, data.artist, data.provider, data.plain, data.timed, data.synced, data.lrc
 ```
