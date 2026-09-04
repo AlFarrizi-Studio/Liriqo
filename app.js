@@ -1,16 +1,19 @@
-// Liriqo Lyrics API — Frontend (Live data from Netlify Blobs via runs-on.dev)
-const LYRICS_API = "https://api-liriqo.runs-on.dev/alfarrizi/v1/lyrics";
-const STATS_API  = "https://api-liriqo.runs-on.dev/alfarrizi/v1/stats";
+// Liriqo Lyrics API — Frontend (Live data from Vercel)
+const _cfg = (typeof window !== "undefined" && window.__LIRIQO_CONFIG__) || {};
+const LYRICS_API = _cfg.lyricsApi || "https://api-liriqo.pages.dev/alfarrizi/v1/lyrics";
+const STATS_API  = _cfg.statsApi  || "https://api-liriqo.pages.dev/alfarrizi/v1/stats";
 
 const ENDPOINTS = [
-  { provider: "LyricFind/Musixmatch", method: "GET", path: "/lyrics?videoId=XXX" },
-  { provider: "Multi-provider", method: "GET", path: "/lyrics?title=X&artist=Y&source=..." },
-  { provider: "Plain text only", method: "GET", path: "/lyrics/plain?videoId=XXX" },
-  { provider: "LRC synced", method: "GET", path: "/lyrics/lrc?videoId=XXX" },
-  { provider: "Search + top 5", method: "GET", path: "/lyrics/search?q=XXX" },
+  { provider: "LyricFind/Musixmatch", method: "GET", path: "/alfarrizi/v1/lyrics?v=VIDEOID" },
+  { provider: "Multi-provider", method: "GET", path: "/alfarrizi/v1/lyrics?title=X&artist=Y&source=..." },
+  { provider: "Plain text only", method: "GET", path: "/alfarrizi/v1/plain?v=VIDEOID" },
+  { provider: "LRC synced", method: "GET", path: "/alfarrizi/v1/lrc?v=VIDEOID" },
+  { provider: "Search + paste link", method: "GET", path: "/alfarrizi/v1/search?q=QUERYorLINK" },
+  { provider: "Force LyricFind", method: "GET", path: "/alfarrizi/v1/lyricfind?v=VIDEOID" },
+  { provider: "Force Musixmatch", method: "GET", path: "/alfarrizi/v1/musixmatch?v=VIDEOID" },
 ];
 
-const API_BASE_URL = "https://api-liriqo.runs-on.dev/alfarrizi/v1/lyrics";
+const API_BASE_URL = "https://api-liriqo.pages.dev/alfarrizi/v1";
 
 // ===== Render Endpoints =====
 function renderEndpoints() {
@@ -143,19 +146,28 @@ let _log = [];
 let _logInitialised = false;
 let _logLastTimestamp = null;
 
+function sortLogsDesc(a, b) {
+  const ai = typeof a?.id === "number" ? a.id : 0;
+  const bi = typeof b?.id === "number" ? b.id : 0;
+  if (bi !== ai) return bi - ai;
+  const at = Date.parse(a?.timestamp) || 0;
+  const bt = Date.parse(b?.timestamp) || 0;
+  return bt - at;
+}
+
 function setLog(entries, opts = {}) {
   const tbody = document.getElementById("log-tbody");
   const emptyEl = document.getElementById("log-empty");
   const countEl = document.getElementById("log-count");
 
   if (!_logInitialised) {
-    _log = (entries || []).slice(0, LOG_MAX);
+    _log = (entries || []).slice(0, LOG_MAX).sort(sortLogsDesc);
     _logInitialised = true;
-    _logLastTimestamp = _log[0]?.timestamp || null;
+    _logLastTimestamp = _log.length ? _log[_log.length - 1].timestamp : null;
     tbody.innerHTML = "";
-    _log.forEach((entry) => {
-      tbody.appendChild(buildLogRow(entry, false));
-    });
+    for (let i = _log.length - 1; i >= 0; i--) {
+      tbody.appendChild(buildLogRow(_log[i], false));
+    }
     if (countEl) countEl.textContent = `${_log.length} entr${_log.length === 1 ? "y" : "ies"} · live · max 100`;
     if (emptyEl) emptyEl.style.display = _log.length ? "none" : "block";
     return;
@@ -167,10 +179,11 @@ function setLog(entries, opts = {}) {
   });
   if (!incoming.length) return;
 
-  const newer = incoming.slice().reverse();
+  const newer = incoming.slice().sort(sortLogsDesc);
   for (const entry of newer) {
     const tr = buildLogRow(entry, true);
-    tbody.insertBefore(tr, tbody.firstChild);
+    if (tbody.firstChild) tbody.insertBefore(tr, tbody.firstChild);
+    else tbody.appendChild(tr);
     _log.unshift(entry);
   }
   _logLastTimestamp = newer[0].timestamp;
@@ -346,6 +359,18 @@ function applyPerformance(perf) {
 }
 
 // ===== Top stats bar =====
+function formatUptime(seconds) {
+  if (!seconds || seconds < 0) return "—";
+  const d = Math.floor(seconds / 86400);
+  const h = Math.floor((seconds % 86400) / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  const s = seconds % 60;
+  if (d > 0) return `${d}d ${h}h ${m}m`;
+  if (h > 0) return `${h}h ${m}m ${s}s`;
+  if (m > 0) return `${m}m ${s}s`;
+  return `${s}s`;
+}
+
 function applyTopStats(s) {
   const total = s.total_requests ?? 0;
   const failed = s.failed_requests ?? 0;
@@ -361,6 +386,26 @@ function applyTopStats(s) {
 
   animateValue(document.getElementById("stat-failed"), failed, 500);
   animateValue(document.getElementById("stat-uptime"), avg, 500);
+
+  const uptimeSec = s.uptime_seconds ?? 0;
+  const liveupEl = document.getElementById("stat-liveup");
+  const liveupSubEl = document.getElementById("stat-liveup-sub");
+  if (liveupEl) {
+    liveupEl.textContent = uptimeSec > 0 ? formatUptime(uptimeSec) : "—";
+    liveupEl.classList.remove("status-up", "status-down", "status-starting");
+    const status = s.status || "starting";
+    liveupEl.classList.add(`status-${status}`);
+  }
+  if (liveupSubEl) {
+    const status = s.status || "starting";
+    const labels = {
+      up: "service live",
+      down: "no heartbeat",
+      starting: "initializing",
+      unknown: "unknown",
+    };
+    liveupSubEl.textContent = labels[status] || "—";
+  }
 }
 
 // ===== Live polling from Netlify Blobs =====
@@ -426,7 +471,7 @@ async function pollStats() {
 
 function startLivePolling() {
   pollStats();
-  setInterval(pollStats, 3000);
+  setInterval(pollStats, 1000);
 }
 
 // ===== Init =====

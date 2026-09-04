@@ -8,6 +8,12 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
+  <script>
+    window.__LIRIQO_CONFIG__ = {
+      lyricsApi: "https://api-liriqo.pages.dev/alfarrizi/v1/lyrics",
+      statsApi:  "https://api-liriqo.pages.dev/alfarrizi/v1/stats",
+    };
+  </script>
 </head>
 <body>
 
@@ -53,16 +59,21 @@
       <span class="stat-value" id="stat-uptime">—</span>
       <span class="stat-sub" id="stat-uptime-sub">milliseconds</span>
     </div>
+    <div class="stat-card teal">
+      <span class="stat-label">Uptime</span>
+      <span class="stat-value" id="stat-liveup">—</span>
+      <span class="stat-sub" id="stat-liveup-sub">service live</span>
+    </div>
   </section>
 
   <main>
     <div class="section-header">
       <span class="section-title">API Endpoints</span>
-      <span class="section-count" id="endpoint-count">5 routes</span>
+      <span class="section-count" id="endpoint-count">7 routes</span>
     </div>
     <div class="api-base-bar">
       <span class="api-base-label">Base URL</span>
-      <code class="api-base-url" id="api-base-url">https://api-liriqo.runs-on.dev/alfarrizi/v1/lyrics</code>
+      <code class="api-base-url" id="api-base-url">https://api-liriqo.pages.dev/alfarrizi/v1</code>
       <button class="btn-copy" id="api-endpoint-copy" title="Copy base URL">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>

@@ -252,6 +252,11 @@ nav {
 .stat-card.green .stat-value { color: var(--green); }
 .stat-card.red .stat-value { color: var(--red); }
 .stat-card.purple .stat-value { color: var(--purple); }
+.stat-card.teal .stat-value { color: var(--teal, #14b8a6); }
+.status-up { color: var(--green, #10b981) !important; }
+.status-down { color: var(--red, #ef4444) !important; }
+.status-starting { color: var(--accent, #60a5fa) !important; }
+.status-unknown { color: var(--muted, #9ca3af) !important; }
 
 @keyframes slideUp {
   from { transform: translateY(60%); opacity: 0; }
