@@ -213,7 +213,6 @@ function buildLogRow(entry, isNew) {
     <td><div class="log-track-artist">${esc(entry.artist || "")}</div></td>
     <td>${providerHtml}</td>
     <td class="log-endpoint" title="${esc(entry.endpoint || "")}">${esc(entry.endpoint || "")}</td>
-    <td class="log-ip col-ip" title="${esc(entry.ip || "")}">${esc(entry.ip || "")}</td>
     <td class="log-ms">${entry.ms ?? 0}</td>
     <td title="${esc(entry.timestamp)}">${timeStr}</td>
   `;
