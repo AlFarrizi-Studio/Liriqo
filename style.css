@@ -1102,13 +1102,11 @@ nav {
 .log-table th:nth-child(4),
 .log-table td:nth-child(4) { width: 110px; }
 .log-table th:nth-child(5),
-.log-table td:nth-child(5) { width: 28%; }
+.log-table td:nth-child(5) { width: 32%; }
 .log-table th:nth-child(6),
-.log-table td:nth-child(6) { width: 110px; }
+.log-table td:nth-child(6) { width: 80px; }
 .log-table th:nth-child(7),
-.log-table td:nth-child(7) { width: 80px; }
-.log-table th:nth-child(8),
-.log-table td:nth-child(8) { width: 90px; }
+.log-table td:nth-child(7) { width: 90px; }
 
 .log-table thead th {
   background: var(--bg-card);
@@ -1272,7 +1270,6 @@ footer a { color: inherit; text-decoration: underline; text-underline-offset: 3p
 }
 
 @media (max-width: 900px) {
-  .log-table .col-ip,
   .log-table td:nth-child(5),
   .log-table th:nth-child(5) { display: none; }
 }
