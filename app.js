@@ -1,4 +1,4 @@
-// Liriqo Lyrics API — Frontend (Live data from Supabase)
+// Liriqo Lyrics API — Frontend (Live data from Netlify Blobs via runs-on.dev)
 const LYRICS_API = "https://api-liriqo.runs-on.dev/alfarrizi/v1/lyrics";
 const STATS_API  = "https://api-liriqo.runs-on.dev/alfarrizi/v1/stats";
 
@@ -137,14 +137,51 @@ function animateValue(el, to, duration = 700) {
   requestAnimationFrame(step);
 }
 
-// ===== Request Log (live from Supabase) =====
-const LOG_PAGE = 10;
+// ===== Request Log (realtime append) =====
+const LOG_MAX = 100;
 let _log = [];
-let _lastLogTimestamp = null;
+let _logInitialised = false;
+let _logLastTimestamp = null;
 
-function setLog(entries) {
-  _log = entries || [];
-  renderLog();
+function setLog(entries, opts = {}) {
+  const tbody = document.getElementById("log-tbody");
+  const emptyEl = document.getElementById("log-empty");
+  const countEl = document.getElementById("log-count");
+
+  if (!_logInitialised) {
+    _log = (entries || []).slice(0, LOG_MAX);
+    _logInitialised = true;
+    _logLastTimestamp = _log[0]?.timestamp || null;
+    tbody.innerHTML = "";
+    _log.forEach((entry) => {
+      tbody.appendChild(buildLogRow(entry, false));
+    });
+    if (countEl) countEl.textContent = `${_log.length} entr${_log.length === 1 ? "y" : "ies"} · live · max 100`;
+    if (emptyEl) emptyEl.style.display = _log.length ? "none" : "block";
+    return;
+  }
+
+  const incoming = (entries || []).filter((e) => {
+    if (!_logLastTimestamp) return true;
+    return e.timestamp > _logLastTimestamp;
+  });
+  if (!incoming.length) return;
+
+  const newer = incoming.slice().reverse();
+  for (const entry of newer) {
+    const tr = buildLogRow(entry, true);
+    tbody.insertBefore(tr, tbody.firstChild);
+    _log.unshift(entry);
+  }
+  _logLastTimestamp = newer[0].timestamp;
+
+  while (_log.length > LOG_MAX) {
+    _log.pop();
+    if (tbody.lastChild) tbody.removeChild(tbody.lastChild);
+  }
+
+  if (countEl) countEl.textContent = `${_log.length} entr${_log.length === 1 ? "y" : "ies"} · live · max 100`;
+  if (emptyEl) emptyEl.style.display = "none";
 }
 
 function buildLogRow(entry, isNew) {
@@ -164,35 +201,23 @@ function buildLogRow(entry, isNew) {
   const time = new Date(entry.timestamp);
   const timeStr = time.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
 
+  const esc = (s) => String(s == null ? "" : s)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+
   tr.innerHTML = `
     <td>${statusHtml}</td>
-    <td><div class="log-track">${entry.title || entry.track || "—"}</div></td>
-    <td><div class="log-track-artist">${entry.artist || ""}</div></td>
+    <td><div class="log-track">${esc(entry.title || entry.track || "—")}</div></td>
+    <td><div class="log-track-artist">${esc(entry.artist || "")}</div></td>
     <td>${providerHtml}</td>
-    <td class="log-endpoint" title="${entry.endpoint || ""}">${entry.endpoint || ""}</td>
-    <td class="log-ip col-ip" title="${entry.ip || ""}">${entry.ip || ""}</td>
+    <td class="log-endpoint" title="${esc(entry.endpoint || "")}">${esc(entry.endpoint || "")}</td>
+    <td class="log-ip col-ip" title="${esc(entry.ip || "")}">${esc(entry.ip || "")}</td>
     <td class="log-ms">${entry.ms ?? 0}</td>
-    <td title="${entry.timestamp}">${timeStr}</td>
+    <td title="${esc(entry.timestamp)}">${timeStr}</td>
   `;
   return tr;
-}
-
-function renderLog() {
-  const tbody = document.getElementById("log-tbody");
-  const emptyEl = document.getElementById("log-empty");
-  const countEl = document.getElementById("log-count");
-
-  countEl.textContent = `${_log.length} entr${_log.length === 1 ? "y" : "ies"} · live · max 100`;
-  emptyEl.style.display = _log.length ? "none" : "block";
-
-  tbody.innerHTML = "";
-  const newest = _log[0]?.timestamp;
-  _log.forEach((entry) => {
-    const isNew = _lastLogTimestamp && entry.timestamp > _lastLogTimestamp;
-    const tr = buildLogRow(entry, isNew);
-    tbody.appendChild(tr);
-  });
-  if (newest) _lastLogTimestamp = newest;
 }
 
 function initLogToggle() {}
@@ -339,10 +364,12 @@ function applyTopStats(s) {
   animateValue(document.getElementById("stat-uptime"), avg, 500);
 }
 
-// ===== Live polling from Supabase =====
-async function fetchStats() {
+// ===== Live polling from Netlify Blobs =====
+let _polling = false;
+
+async function fetchFullStats() {
   try {
-    const r = await fetch(`${STATS_API}?limit=100&t=${Date.now()}`);
+    const r = await fetch(`${STATS_API}?t=${Date.now()}`);
     if (!r.ok) return null;
     return await r.json();
   } catch {
@@ -350,36 +377,49 @@ async function fetchStats() {
   }
 }
 
-let _polling = false;
+async function fetchLogsSince(ts) {
+  try {
+    const sinceParam = ts ? `&since=${encodeURIComponent(ts)}` : "";
+    const r = await fetch(`${STATS_API}?t=${Date.now()}&logsOnly=1${sinceParam}`);
+    if (!r.ok) return null;
+    return await r.json();
+  } catch {
+    return null;
+  }
+}
 
 async function pollStats() {
   if (_polling) return;
   _polling = true;
   try {
-    const data = await fetchStats();
-    if (!data) return;
-
-    applyTopStats(data);
-
-    const providers = {
-      LyricFind: {
-        hits: data.providers?.LyricFind?.hits ?? 0,
-        success_rate: data.providers?.LyricFind?.success_rate ?? "100%",
-        avg_ms: data.performance?.LyricFind?.length
-          ? data.performance.LyricFind.reduce((a, b) => a + b, 0) / data.performance.LyricFind.length
-          : 0,
-      },
-      Musixmatch: {
-        hits: data.providers?.Musixmatch?.hits ?? 0,
-        success_rate: data.providers?.Musixmatch?.success_rate ?? "100%",
-        avg_ms: data.performance?.Musixmatch?.length
-          ? data.performance.Musixmatch.reduce((a, b) => a + b, 0) / data.performance.Musixmatch.length
-          : 0,
-      },
-    };
-    updateLyricProviderStats(providers);
-    applyPerformance(data.performance);
-    setLog(data.logs || []);
+    const [full, delta] = await Promise.all([
+      fetchFullStats(),
+      fetchLogsSince(_logLastTimestamp),
+    ]);
+    if (full) {
+      applyTopStats(full);
+      const providers = {
+        LyricFind: {
+          hits: full.providers?.LyricFind?.hits ?? 0,
+          success_rate: full.providers?.LyricFind?.success_rate ?? "100%",
+          avg_ms: full.performance?.LyricFind?.length
+            ? full.performance.LyricFind.reduce((a, b) => a + b, 0) / full.performance.LyricFind.length
+            : 0,
+        },
+        Musixmatch: {
+          hits: full.providers?.Musixmatch?.hits ?? 0,
+          success_rate: full.providers?.Musixmatch?.success_rate ?? "100%",
+          avg_ms: full.performance?.Musixmatch?.length
+            ? full.performance.Musixmatch.reduce((a, b) => a + b, 0) / full.performance.Musixmatch.length
+            : 0,
+        },
+      };
+      updateLyricProviderStats(providers);
+      applyPerformance(full.performance);
+    }
+    if (delta) {
+      setLog(delta.logs || []);
+    }
   } finally {
     _polling = false;
   }
