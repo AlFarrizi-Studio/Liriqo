@@ -161,12 +161,14 @@ function setLog(entries, opts = {}) {
   const countEl = document.getElementById("log-count");
 
   if (!_logInitialised) {
-    _log = (entries || []).slice(0, LOG_MAX).sort(sortLogsDesc);
+    const sorted = (entries || []).slice(0, LOG_MAX).sort(sortLogsDesc);
+    _log = sorted.slice().reverse();
     _logInitialised = true;
-    _logLastTimestamp = _log.length ? _log[_log.length - 1].timestamp : null;
+    _logLastTimestamp = sorted.length ? sorted[0].timestamp : null;
     tbody.innerHTML = "";
-    for (let i = _log.length - 1; i >= 0; i--) {
-      tbody.appendChild(buildLogRow(_log[i], false));
+    for (let i = sorted.length - 1; i >= 0; i--) {
+      if (tbody.firstChild) tbody.insertBefore(buildLogRow(sorted[i], false), tbody.firstChild);
+      else tbody.appendChild(buildLogRow(sorted[i], false));
     }
     if (countEl) countEl.textContent = `${_log.length} entr${_log.length === 1 ? "y" : "ies"} · live · max 100`;
     if (emptyEl) emptyEl.style.display = _log.length ? "none" : "block";
