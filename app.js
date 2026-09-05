@@ -1,4 +1,4 @@
-// Liriqo Lyrics API — Frontend (Live data from Vercel)
+// Liriqo Lyrics API — Frontend (Live data from Cloudflare Pages)
 const _cfg = (typeof window !== "undefined" && window.__LIRIQO_CONFIG__) || {};
 const LYRICS_API = _cfg.lyricsApi || "https://api-liriqo.pages.dev/alfarrizi/v1/lyrics";
 const STATS_API  = _cfg.statsApi  || "https://api-liriqo.pages.dev/alfarrizi/v1/stats";
@@ -13,7 +13,7 @@ const ENDPOINTS = [
   { provider: "Force Musixmatch", method: "GET", path: "/alfarrizi/v1/musixmatch?v=VIDEOID" },
 ];
 
-const API_BASE_URL = "https://api-liriqo.pages.dev/alfarrizi/v1";
+const API_BASE_URL = "https://api-liriqo.pages.dev/alfarrizi/v1/lyrics";
 
 // ===== Render Endpoints =====
 function renderEndpoints() {
