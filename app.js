@@ -4,16 +4,16 @@ const LYRICS_API = _cfg.lyricsApi || "https://api-liriqo.pages.dev/alfarrizi/v1/
 const STATS_API  = _cfg.statsApi  || "https://api-liriqo.pages.dev/alfarrizi/v1/stats";
 
 const ENDPOINTS = [
-  { provider: "LyricFind/Musixmatch", method: "GET", path: "/alfarrizi/v1/lyrics?v=VIDEOID" },
-  { provider: "Multi-provider", method: "GET", path: "/alfarrizi/v1/lyrics?title=X&artist=Y&source=..." },
-  { provider: "Plain text only", method: "GET", path: "/alfarrizi/v1/plain?v=VIDEOID" },
-  { provider: "LRC synced", method: "GET", path: "/alfarrizi/v1/lrc?v=VIDEOID" },
-  { provider: "Search + paste link", method: "GET", path: "/alfarrizi/v1/search?q=QUERYorLINK" },
-  { provider: "Force LyricFind", method: "GET", path: "/alfarrizi/v1/lyricfind?v=VIDEOID" },
-  { provider: "Force Musixmatch", method: "GET", path: "/alfarrizi/v1/musixmatch?v=VIDEOID" },
+  { provider: "LyricFind/Musixmatch", method: "GET", path: "/lyrics?v=VIDEOID" },
+  { provider: "Multi-provider", method: "GET", path: "/lyrics?title=X&artist=Y&source=..." },
+  { provider: "Plain text only", method: "GET", path: "/plain?v=VIDEOID" },
+  { provider: "LRC synced", method: "GET", path: "/lrc?v=VIDEOID" },
+  { provider: "Search + paste link", method: "GET", path: "/search?q=QUERYorLINK" },
+  { provider: "Force LyricFind", method: "GET", path: "/lyricfind?v=VIDEOID" },
+  { provider: "Force Musixmatch", method: "GET", path: "/musixmatch?v=VIDEOID" },
 ];
 
-const API_BASE_URL = "https://api-liriqo.pages.dev/alfarrizi/v1/lyrics";
+const API_BASE_URL = "https://api-liriqo.pages.dev/alfarrizi/v1";
 
 // ===== Render Endpoints =====
 function renderEndpoints() {
